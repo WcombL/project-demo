@@ -1,0 +1,37 @@
+package com.lei.boot.controller;
+
+import com.lei.boot.domain.Book;
+import com.lei.boot.repository.BookRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@Controller
+@RequestMapping("/")
+public class BookController {
+
+    @Autowired
+    private BookRepository bookRepo;
+
+    @RequestMapping(value = "/{reader}", method = RequestMethod.GET)
+    public String readersBooks(@PathVariable("reader") String reader, Model model) {
+        List<Book> readingList = bookRepo.findByReader(reader);
+        if (readingList != null) {
+            model.addAttribute("books", readingList);
+        }
+        return "readingList";
+    }
+
+    @RequestMapping(value = "/{reader}", method = RequestMethod.POST)
+    public String addToReadingList(@PathVariable("reader") String reader, Book book) {
+        book.setReader(reader);
+        bookRepo.save(book);
+        return "redirect:/{reader}";
+    }
+}
